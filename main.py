@@ -7,9 +7,9 @@ from firebase_admin import firestore
 import geocoder
 import datetime
 
+# Firebase初期化
 cred = credentials.Certificate('serviceAccountKey.json')
 firebase_admin.initialize_app(cred)
-
 db = firestore.client()
 
 # モデルのロード
@@ -19,12 +19,14 @@ nlp = spacy.load("ja_core_news_md")
 response = requests.get('https://news.yahoo.co.jp/search?p=%23安倍晋三&ei=UTF-8')
 # レスポンスを成形
 html = BeautifulSoup(response.content, 'html.parser')
-# 特定のキーワードを抽出
+
+# 先頭10記事分のカウンタ
 i = 1
+
 articles = []
 for a in html.select('.newsFeed a'):
-# 出力処理
-  # print(a['href'], list(a.strings)[0])
+
+  # 個別のニュース記事を取得
   response = requests.get(a['href'])
   html = BeautifulSoup(response.content, 'html.parser')
 
@@ -35,15 +37,12 @@ for a in html.select('.newsFeed a'):
   print('記事のタイトル: ', title)
   print('配信日時: ', time)
   print('------------------')
-  # print(data)
   data = {}
 
   body = html.select('.article_body.highLightSearchTarget p')
   
-  # bodyStrings = p.sub("", body[1])
   # モデルに解析対象のテキストを渡す
   doc = nlp(body[1].text)
-  sample_text = body[1].text
 
   # 固有表現を抽出
   tags = []
@@ -55,8 +54,10 @@ for a in html.select('.newsFeed a'):
       # print(ent.text, ent.label_)
       tags.append(ent.text)
 
+  # 重複した地名を削除
   preTags = list(set(tags))
 
+  # 地名を元に座標を取得
   positions = []
   for tag in preTags:
     location = {}
@@ -79,7 +80,7 @@ for a in html.select('.newsFeed a'):
 
 DIFF_JST_FROM_UTC = 9
 now = datetime.datetime.utcnow() + datetime.timedelta(hours=DIFF_JST_FROM_UTC)
-doc_ref = db.collection(u'trace').document(u'articles')
+doc_ref = db.collection(u'trace').document(u'test')
 doc_ref.set({
   u'articles': articles,
   u'updated_at': now.strftime("%Y/%m/%d %H:%M")
