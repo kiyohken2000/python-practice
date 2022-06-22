@@ -1,0 +1,4 @@
+python main.py
+python test.py
+pip freeze > requirements.txt
+python -c "import test; test.hello_pubsub()"
