@@ -85,6 +85,6 @@ def hello_pubsub(event, context):
 	now = datetime.datetime.utcnow() + datetime.timedelta(hours=DIFF_JST_FROM_UTC)
 	doc_ref = db.collection(u'trace').document(u'articles')
 	doc_ref.set({
-				u'articles': articles,
-				u'updated_at': now.strftime("%Y/%m/%d %H:%M")
+		u'articles': articles,
+		u'updated_at': now.strftime("%Y/%m/%d %H:%M")
 	})
