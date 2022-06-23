@@ -42,7 +42,8 @@ for a in html.select('.newsFeed a'):
   body = html.select('.article_body.highLightSearchTarget p')
   
   # モデルに解析対象のテキストを渡す
-  doc = nlp(body[1].text)
+  bodyText = body[0].text + body[1].text
+  doc = nlp(bodyText)
 
   # 固有表現を抽出
   tags = []
