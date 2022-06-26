@@ -40,41 +40,41 @@ for a in html.select('.newsFeed a'):
   data = {}
 
   body = html.select('.article_body.highLightSearchTarget p')
-  
-  # モデルに解析対象のテキストを渡す
-  bodyText = body[0].text + body[1].text
-  doc = nlp(bodyText)
+  if(len(body) >= 2):
+    # モデルに解析対象のテキストを渡す
+    bodyText = body[0].text + body[1].text
+    doc = nlp(bodyText)
 
-  # 固有表現を抽出
-  tags = []
-  for ent in doc.ents:
-    # print(ent.text, ent.label_)
-    # tags.append(ent.text)
-
-    if ent.label_ == 'GPE':
+    # 固有表現を抽出
+    tags = []
+    for ent in doc.ents:
       # print(ent.text, ent.label_)
-      tags.append(ent.text)
+      # tags.append(ent.text)
 
-  # 重複した地名を削除
-  preTags = list(set(tags))
+      if ent.label_ == 'GPE':
+        # print(ent.text, ent.label_)
+        tags.append(ent.text)
 
-  # 地名を元に座標を取得
-  positions = []
-  for tag in preTags:
-    location = {}
-    ret = geocoder.osm(tag, timeout=5.0)
-    location['label'] = tag
-    location['position'] = ret.latlng
-    if ret.latlng != None:
-      positions.append(location)
+    # 重複した地名を削除
+    preTags = list(set(tags))
 
-  data['title'] = title
-  data['time'] = time
-  data['url'] = url
-  data['positions'] = positions
-  articles.append(data)
-  if i >= 10 :
-    break
+    # 地名を元に座標を取得
+    positions = []
+    for tag in preTags:
+      location = {}
+      ret = geocoder.osm(tag, timeout=5.0)
+      location['label'] = tag
+      location['position'] = ret.latlng
+      if ret.latlng != None:
+        positions.append(location)
+
+    data['title'] = title
+    data['time'] = time
+    data['url'] = url
+    data['positions'] = positions
+    articles.append(data)
+    if i >= 10 :
+      break
   i = i + 1
   
 # print(articles)
